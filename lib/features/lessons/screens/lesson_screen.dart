@@ -8,6 +8,8 @@ import '../../../core/providers/language_provider.dart';
 import '../../../core/providers/progress_provider.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../widgets/question_widget.dart';
+import '../widgets/lesson_completion_widget.dart';
 
 class LessonScreen extends StatefulWidget {
   final String lessonId;
@@ -91,7 +93,16 @@ class _LessonScreenState extends State<LessonScreen> {
           }
 
           if (_currentQuestionIndex >= lesson.content.length) {
-            return _buildCompletionScreen(lesson);
+            final accuracy = _correctAnswers / lesson.content.length;
+            final timeSpent = DateTime.now().difference(_startTime!).inSeconds;
+            
+            return LessonCompletionWidget(
+              score: _score,
+              accuracy: accuracy,
+              timeSpent: timeSpent,
+              xpReward: lesson.xpReward,
+              onContinue: () => _completeLesson(lesson, accuracy, timeSpent),
+            );
           }
 
           final question = lesson.content[_currentQuestionIndex];
@@ -133,101 +144,17 @@ class _LessonScreenState extends State<LessonScreen> {
 
                       // Options
                       Expanded(
-                        child: ListView.separated(
-                          itemCount: question.options.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final option = question.options[index];
-                            final isSelected = _selectedAnswer == option;
-                            final isCorrect = option == question.correct;
-                            
-                            Color? backgroundColor;
-                            Color? borderColor;
-                            Color? textColor;
-                            
-                            if (_showResult) {
-                              if (isCorrect) {
-                                backgroundColor = AppTheme.successColor.withOpacity(0.1);
-                                borderColor = AppTheme.successColor;
-                                textColor = AppTheme.successColor;
-                              } else if (isSelected && !isCorrect) {
-                                backgroundColor = AppTheme.errorColor.withOpacity(0.1);
-                                borderColor = AppTheme.errorColor;
-                                textColor = AppTheme.errorColor;
-                              }
-                            } else if (isSelected) {
-                              backgroundColor = AppTheme.primaryColor.withOpacity(0.1);
-                              borderColor = AppTheme.primaryColor;
-                              textColor = AppTheme.primaryColor;
-                            }
-
-                            return GestureDetector(
-                              onTap: _showResult ? null : () {
-                                setState(() {
-                                  _selectedAnswer = option;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: backgroundColor ?? AppTheme.surfaceColor,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: borderColor ?? AppTheme.borderColor,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: textColor?.withOpacity(0.2),
-                                        border: Border.all(
-                                          color: textColor ?? AppTheme.borderColor,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          String.fromCharCode(65 + index), // A, B, C, D
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: textColor ?? AppTheme.textSecondary,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Text(
-                                        option,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: textColor ?? AppTheme.textPrimary,
-                                        ),
-                                      ),
-                                    ),
-                                    if (_showResult && isCorrect)
-                                      const Icon(
-                                        LucideIcons.checkCircle,
-                                        color: AppTheme.successColor,
-                                        size: 24,
-                                      ),
-                                    if (_showResult && isSelected && !isCorrect)
-                                      const Icon(
-                                        LucideIcons.xCircle,
-                                        color: AppTheme.errorColor,
-                                        size: 24,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                        child: SingleChildScrollView(
+                          child: QuestionWidget(
+                            question: question,
+                            selectedAnswer: _selectedAnswer,
+                            showResult: _showResult,
+                            onOptionTap: (option) {
+                              setState(() {
+                                _selectedAnswer = option;
+                              });
+                            },
+                          ),
                         ),
                       ),
 
@@ -282,122 +209,6 @@ class _LessonScreenState extends State<LessonScreen> {
     });
   }
 
-  Widget _buildCompletionScreen(lesson) {
-    final accuracy = _correctAnswers / lesson.content.length;
-    final timeSpent = DateTime.now().difference(_startTime!).inSeconds;
-    
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppTheme.successColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              LucideIcons.trophy,
-              size: 60,
-              color: AppTheme.successColor,
-            ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          Text(
-            'Lesson Complete!',
-            style: GoogleFonts.inter(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          Text(
-            'Great job! You\'ve completed this lesson.',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              color: AppTheme.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Stats
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatItem(
-                icon: LucideIcons.target,
-                label: 'Accuracy',
-                value: '${(accuracy * 100).round()}%',
-              ),
-              _buildStatItem(
-                icon: LucideIcons.zap,
-                label: 'XP Earned',
-                value: '${lesson.xpReward}',
-              ),
-              _buildStatItem(
-                icon: LucideIcons.clock,
-                label: 'Time',
-                value: '${timeSpent}s',
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 48),
-          
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _completeLesson(lesson, accuracy, timeSpent),
-              child: const Text('Continue'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          size: 32,
-          color: AppTheme.primaryColor,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: AppTheme.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-
   void _completeLesson(lesson, double accuracy, int timeSpent) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final progressProvider = Provider.of<ProgressProvider>(context, listen: false);
@@ -411,6 +222,7 @@ class _LessonScreenState extends State<LessonScreen> {
         accuracy: accuracy,
         timeSpent: timeSpent,
         xpReward: lesson.xpReward,
+        context: context,
       );
     }
     

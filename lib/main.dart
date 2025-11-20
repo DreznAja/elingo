@@ -6,6 +6,8 @@ import 'core/config/supabase_config.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/providers/progress_provider.dart';
+import 'core/providers/achievements_provider.dart';
+import 'core/providers/settings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
@@ -31,6 +33,8 @@ class ElingoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => ProgressProvider()),
+        ChangeNotifierProvider(create: (_) => AchievementsProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {

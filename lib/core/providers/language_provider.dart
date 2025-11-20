@@ -62,8 +62,10 @@ class LanguageProvider extends ChangeNotifier {
           .toList();
 
       notifyListeners();
+      return; // Add explicit return for Future<void>
     } catch (e) {
       _setError('Failed to load courses: $e');
+      rethrow; // Re-throw error so caller can handle it
     } finally {
       _setLoading(false);
     }

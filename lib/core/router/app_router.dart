@@ -11,6 +11,9 @@ import '../../features/profile/screens/profile_screen.dart';
 import '../../features/languages/screens/language_selection_screen.dart';
 import '../../features/courses/screens/course_detail_screen.dart';
 import '../../features/lessons/screens/lesson_screen.dart';
+import '../../features/achievements/screens/achievements_screen.dart';
+import '../../features/settings/screens/settings_screen.dart';
+import '../../features/help/screens/help_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -70,6 +73,18 @@ class AppRouter {
           final lessonId = state.pathParameters['lessonId']!;
           return LessonScreen(lessonId: lessonId);
         },
+      ),
+      GoRoute(
+        path: '/achievements',
+        builder: (context, state) => const AchievementsScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/help',
+        builder: (context, state) => const HelpScreen(),
       ),
     ],
   );

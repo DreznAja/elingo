@@ -193,16 +193,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildActionTile(
                       icon: LucideIcons.settings,
                       title: 'Settings',
-                      onTap: () {
-                        // TODO: Navigate to settings
-                      },
+                      onTap: () => context.go('/settings'),
                     ),
                     _buildActionTile(
                       icon: LucideIcons.helpCircle,
                       title: 'Help & Support',
-                      onTap: () {
-                        // TODO: Navigate to help
-                      },
+                      onTap: () => context.go('/help'),
                     ),
                     _buildActionTile(
                       icon: LucideIcons.shield,

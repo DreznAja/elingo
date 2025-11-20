@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'achievements_provider.dart';
 
 class ProgressProvider extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -69,6 +72,7 @@ class ProgressProvider extends ChangeNotifier {
     required double accuracy,
     required int timeSpent,
     required int xpReward,
+    BuildContext? context,
   }) async {
     try {
       _setLoading(true);
@@ -101,6 +105,11 @@ class ProgressProvider extends ChangeNotifier {
         'xp_to_add': xpReward,
       });
 
+      // Update user streak
+      await _supabase.rpc('update_user_streak', params: {
+        'user_id': userId,
+      });
+
       // Update daily goal
       if (_dailyGoal != null) {
         final currentValue = _dailyGoal!['current_value'] ?? 0;
@@ -119,6 +128,12 @@ class ProgressProvider extends ChangeNotifier {
       // Update local state
       _courseProgress[courseId] = newProgress;
       _completedLessons.add(lessonId);
+
+      // Check for new achievements
+      if (context != null) {
+        final achievementsProvider = Provider.of<AchievementsProvider>(context, listen: false);
+        await achievementsProvider.checkAndUnlockAchievements(userId);
+      }
 
       notifyListeners();
     } catch (e) {

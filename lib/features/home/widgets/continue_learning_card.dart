@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -33,15 +34,21 @@ class ContinueLearningCard extends StatelessWidget {
   Widget _buildSelectLanguageCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Switch to languages tab
-        // This would need to be handled by the parent widget
+        // Navigate to language selection screen
+        context.go('/languages');
       },
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -93,12 +100,23 @@ class ContinueLearningCard extends StatelessWidget {
   }
 
   Widget _buildSelectCourseCard(BuildContext context, language) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        // Navigate to language selection to show courses for this language
+        context.go('/languages');
+      },
+      child: Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -146,6 +164,7 @@ class ContinueLearningCard extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -155,12 +174,20 @@ class ContinueLearningCard extends StatelessWidget {
         final progress = progressProvider.getCourseProgress(course.id);
         final progressPercentage = progress / course.totalLessons;
         
-        return Container(
+        return GestureDetector(
+          onTap: () => context.go('/course/${course.id}'),
+          child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.borderColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,6 +251,7 @@ class ContinueLearningCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
           ),
         );
       },

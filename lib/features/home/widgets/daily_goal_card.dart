@@ -27,57 +27,81 @@ class DailyGoalCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isCompleted 
-                  ? [AppTheme.successColor, AppTheme.successColor.withOpacity(0.8)]
-                  : [AppTheme.primaryColor, AppTheme.secondaryColor],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(
-                    isCompleted ? LucideIcons.checkCircle : LucideIcons.target,
-                    color: Colors.white,
-                    size: 24,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isCompleted 
+                            ? [AppTheme.successColor, AppTheme.successColor.withOpacity(0.8)]
+                            : [AppTheme.primaryColor, AppTheme.secondaryColor],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      isCompleted ? LucideIcons.checkCircle : LucideIcons.target,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isCompleted ? 'Daily Goal Complete! 🎉' : 'Daily Goal',
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isCompleted 
+                              ? 'Amazing! You\'ve completed your daily goal.'
+                              : 'Complete ${targetValue - currentValue} more lesson${targetValue - currentValue == 1 ? '' : 's'} today',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isCompleted 
+                          ? AppTheme.successColor.withOpacity(0.1)
+                          : AppTheme.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Text(
-                      isCompleted ? 'Daily Goal Complete!' : 'Daily Goal',
+                      '$currentValue/$targetValue',
                       style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isCompleted ? AppTheme.successColor : AppTheme.primaryColor,
                       ),
                     ),
                   ),
-                  Text(
-                    '$currentValue/$targetValue',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
                 ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              Text(
-                isCompleted 
-                    ? 'Amazing! You\'ve completed your daily goal.'
-                    : 'Complete ${targetValue - currentValue} more lessons today',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.9),
-                ),
               ),
               
               const SizedBox(height: 16),
@@ -86,8 +110,10 @@ class DailyGoalCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
-                  backgroundColor: Colors.white.withOpacity(0.3),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  backgroundColor: AppTheme.borderColor.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isCompleted ? AppTheme.successColor : AppTheme.primaryColor,
+                  ),
                   minHeight: 8,
                 ),
               ),

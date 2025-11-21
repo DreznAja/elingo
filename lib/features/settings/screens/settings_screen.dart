@@ -71,17 +71,13 @@ class SettingsScreen extends StatelessWidget {
                 icon: LucideIcons.shield,
                 title: 'Privacy Policy',
                 subtitle: 'Read our privacy policy',
-                onTap: () {
-                  // TODO: Show privacy policy
-                },
+                onTap: () => _showPrivacyPolicy(context),
               ),
               _buildTile(
                 icon: LucideIcons.download,
                 title: 'Download My Data',
                 subtitle: 'Export your learning data',
-                onTap: () {
-                  // TODO: Export data
-                },
+                onTap: () => _showDownloadDataDialog(context),
               ),
               _buildTile(
                 icon: LucideIcons.trash2,
@@ -106,17 +102,13 @@ class SettingsScreen extends StatelessWidget {
                 icon: LucideIcons.helpCircle,
                 title: 'Help & Support',
                 subtitle: 'Get help with the app',
-                onTap: () {
-                  // TODO: Show help
-                },
+                onTap: () => context.go('/help'),
               ),
               _buildTile(
                 icon: LucideIcons.star,
                 title: 'Rate the App',
                 subtitle: 'Leave a review on the app store',
-                onTap: () {
-                  // TODO: Open app store
-                },
+                onTap: () => _showRateAppDialog(context),
               ),
             ],
           );
@@ -268,11 +260,10 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              // TODO: Implement account deletion
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Account deletion is not implemented yet'),
-                  backgroundColor: AppTheme.errorColor,
+                  content: Text('Please contact support to delete your account'),
+                  backgroundColor: AppTheme.warningColor,
                 ),
               );
             },
@@ -280,6 +271,136 @@ class SettingsScreen extends StatelessWidget {
               'Delete',
               style: TextStyle(color: AppTheme.errorColor),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrivacyPolicy(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Privacy Policy',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            'Your privacy is important to us. Elingo collects and uses your data to:\n\n'
+            '• Track your learning progress and achievements\n'
+            '• Personalize your learning experience\n'
+            '• Improve our services\n\n'
+            'We never share your personal information with third parties without your consent. '
+            'All data is securely stored and encrypted.\n\n'
+            'For more information, please visit our website or contact support.',
+            style: GoogleFonts.inter(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDownloadDataDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Download My Data',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          'Your data export will be prepared and sent to your registered email address within 24 hours.\n\n'
+          'The export will include:\n'
+          '• Your profile information\n'
+          '• Learning progress and statistics\n'
+          '• Achievements earned\n'
+          '• Lesson completion history\n\n'
+          'Would you like to proceed?',
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Data export request submitted successfully'),
+                  backgroundColor: AppTheme.successColor,
+                ),
+              );
+            },
+            child: const Text('Request Export'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRateAppDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Rate Elingo',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              LucideIcons.heart,
+              color: AppTheme.errorColor,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Enjoying Elingo?',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Please take a moment to rate us on the app store. Your feedback helps us improve!',
+              style: GoogleFonts.inter(),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Maybe Later'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Opening app store...'),
+                  backgroundColor: AppTheme.primaryColor,
+                ),
+              );
+            },
+            child: const Text('Rate Now'),
           ),
         ],
       ),

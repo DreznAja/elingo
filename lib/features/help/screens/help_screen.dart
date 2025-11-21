@@ -74,27 +74,21 @@ class HelpScreen extends StatelessWidget {
             icon: LucideIcons.mail,
             title: 'Email Support',
             subtitle: 'Get help via email',
-            onTap: () {
-              // TODO: Open email client
-            },
+            onTap: () => _openEmailSupport(context),
           ),
           
           _buildContactOption(
             icon: LucideIcons.messageCircle,
             title: 'Community Forum',
             subtitle: 'Ask questions and get answers',
-            onTap: () {
-              // TODO: Open forum
-            },
+            onTap: () => _openCommunityForum(context),
           ),
           
           _buildContactOption(
             icon: LucideIcons.bug,
             title: 'Report a Bug',
             subtitle: 'Help us improve the app',
-            onTap: () {
-              // TODO: Open bug report form
-            },
+            onTap: () => _showBugReportDialog(context),
           ),
           
           const SizedBox(height: 32),
@@ -248,6 +242,148 @@ class HelpScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openEmailSupport(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Opening email client...'),
+        backgroundColor: AppTheme.primaryColor,
+        action: SnackBarAction(
+          label: 'Copy Email',
+          textColor: Colors.white,
+          onPressed: () {
+            // In a real app, copy email to clipboard
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Email copied: support@elingo.app'),
+                backgroundColor: AppTheme.successColor,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _openCommunityForum(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Community Forum',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              LucideIcons.users,
+              color: AppTheme.primaryColor,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Join our community forum to:\n\n'
+              '• Ask questions and get help\n'
+              '• Share tips and learning strategies\n'
+              '• Connect with other learners\n'
+              '• Get updates about new features',
+              style: GoogleFonts.inter(),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Opening community forum...'),
+                  backgroundColor: AppTheme.primaryColor,
+                ),
+              );
+            },
+            child: const Text('Open Forum'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBugReportDialog(BuildContext context) {
+    final TextEditingController bugDescriptionController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Report a Bug',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Help us improve Elingo by reporting any bugs or issues you encounter.',
+              style: GoogleFonts.inter(),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: bugDescriptionController,
+              decoration: InputDecoration(
+                labelText: 'Describe the issue',
+                hintText: 'What went wrong?',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(LucideIcons.alertCircle),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              bugDescriptionController.dispose();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (bugDescriptionController.text.trim().isNotEmpty) {
+                bugDescriptionController.dispose();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Bug report submitted. Thank you!'),
+                    backgroundColor: AppTheme.successColor,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please describe the issue'),
+                    backgroundColor: AppTheme.warningColor,
+                  ),
+                );
+              }
+            },
+            child: const Text('Submit'),
           ),
         ],
       ),

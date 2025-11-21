@@ -129,13 +129,13 @@ class ProgressProvider extends ChangeNotifier {
       _courseProgress[courseId] = newProgress;
       _completedLessons.add(lessonId);
 
+      notifyListeners();
+
       // Check for new achievements
-      if (context != null) {
+      if (context != null && context.mounted) {
         final achievementsProvider = Provider.of<AchievementsProvider>(context, listen: false);
         await achievementsProvider.checkAndUnlockAchievements(userId);
       }
-
-      notifyListeners();
     } catch (e) {
       _setError('Failed to complete lesson: $e');
     } finally {
@@ -149,6 +149,53 @@ class ProgressProvider extends ChangeNotifier {
 
   bool isLessonCompleted(String lessonId) {
     return _completedLessons.contains(lessonId);
+  }
+
+  Future<Map<String, dynamic>?> getUserOverallStats(String userId) async {
+    try {
+      final response = await _supabase
+          .from('user_profiles')
+          .select('level, total_xp, current_streak, longest_streak')
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (response == null) return null;
+
+      final completionsCount = await _supabase
+          .from('lesson_completions')
+          .select('id')
+          .eq('user_id', userId)
+          .count();
+
+      final completions = await _supabase
+          .from('lesson_completions')
+          .select('accuracy, time_spent')
+          .eq('user_id', userId);
+
+      double totalAccuracy = 0;
+      int totalTimeSpent = 0;
+      
+      for (final completion in completions) {
+        totalAccuracy += (completion['accuracy'] ?? 0.0) as double;
+        totalTimeSpent += ((completion['time_spent'] ?? 0) as num).toInt();
+      }
+
+      final averageAccuracy = completions.isNotEmpty 
+          ? totalAccuracy / completions.length 
+          : 0.0;
+
+      return {
+        'level': response['level'] ?? 1,
+        'total_xp': response['total_xp'] ?? 0,
+        'current_streak': response['current_streak'] ?? 0,
+        'longest_streak': response['longest_streak'] ?? 0,
+        'total_lessons_completed': completionsCount,
+        'average_accuracy': averageAccuracy,
+        'total_time_spent': totalTimeSpent,
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   void _setLoading(bool loading) {

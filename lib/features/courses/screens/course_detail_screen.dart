@@ -146,9 +146,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           ),
                           IconButton(
                             icon: const Icon(LucideIcons.moreVertical, color: Colors.white),
-                            onPressed: () {
-                              // TODO: Show course options
-                            },
+                            onPressed: () => _showCourseOptions(context, course),
                           ),
                         ],
                       ),
@@ -733,6 +731,214 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCourseOptions(BuildContext context, dynamic course) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.borderColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Course Options',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildOptionTile(
+              icon: LucideIcons.info,
+              title: 'Course Information',
+              subtitle: 'View details about this course',
+              onTap: () {
+                Navigator.pop(context);
+                _showCourseInfo(context, course);
+              },
+            ),
+            _buildOptionTile(
+              icon: LucideIcons.refreshCw,
+              title: 'Reset Progress',
+              subtitle: 'Start this course from the beginning',
+              onTap: () {
+                Navigator.pop(context);
+                _showResetProgressDialog(context, course);
+              },
+            ),
+            _buildOptionTile(
+              icon: LucideIcons.share2,
+              title: 'Share Course',
+              subtitle: 'Share this course with friends',
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Sharing functionality coming soon!'),
+                    backgroundColor: AppTheme.infoColor,
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          color: AppTheme.primaryColor,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: AppTheme.textPrimary,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          color: AppTheme.textSecondary,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+
+  void _showCourseInfo(BuildContext context, dynamic course) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          course.title,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (course.description != null) ...[
+                Text(
+                  course.description!,
+                  style: GoogleFonts.inter(),
+                ),
+                const SizedBox(height: 16),
+              ],
+              _buildInfoRow(LucideIcons.bookOpen, '${course.totalLessons} lessons'),
+              const SizedBox(height: 8),
+              _buildInfoRow(LucideIcons.clock, '~${course.totalLessons * 5} minutes'),
+              const SizedBox(height: 8),
+              _buildInfoRow(LucideIcons.target, 'Learn essential skills'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: AppTheme.textSecondary,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showResetProgressDialog(BuildContext context, dynamic course) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Reset Progress',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.warningColor,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to reset your progress for "${course.title}"?\n\n'
+          'This will remove all completed lessons and earned XP for this course. '
+          'This action cannot be undone.',
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Progress reset functionality coming soon'),
+                  backgroundColor: AppTheme.warningColor,
+                ),
+              );
+            },
+            child: Text(
+              'Reset',
+              style: TextStyle(color: AppTheme.warningColor),
+            ),
+          ),
+        ],
       ),
     );
   }

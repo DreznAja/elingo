@@ -203,9 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildActionTile(
                       icon: LucideIcons.shield,
                       title: 'Privacy Policy',
-                      onTap: () {
-                        // TODO: Show privacy policy
-                      },
+                      onTap: () => _showPrivacyPolicy(context),
                     ),
                     _buildActionTile(
                       icon: LucideIcons.logOut,
@@ -374,6 +372,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Provider.of<AuthProvider>(context, listen: false).signOut();
             },
             child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrivacyPolicy(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Privacy Policy',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            'Your privacy is important to us. Elingo collects and uses your data to:\n\n'
+            '• Track your learning progress and achievements\n'
+            '• Personalize your learning experience\n'
+            '• Improve our services\n\n'
+            'We never share your personal information with third parties without your consent. '
+            'All data is securely stored and encrypted.\n\n'
+            'For more information, please visit our website or contact support.',
+            style: GoogleFonts.inter(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
           ),
         ],
       ),
